@@ -1,0 +1,29 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1570224278414.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "9DE8D348",
+    "lastKnownWriteTime" : 29555177500377187,
+    "last_content_update" : 1570224278414,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "D4B391D",
+        "caption" : "coun",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=coun&cache_key=D4B391D",
+        "displayedObservations" : 214,
+        "environment" : "",
+        "object" : "coun",
+        "preview" : 0,
+        "totalObservations" : 214,
+        "variables" : 1
+    },
+    "relative_order" : 14,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

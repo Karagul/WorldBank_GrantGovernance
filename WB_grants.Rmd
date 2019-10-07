@@ -1,0 +1,225 @@
+---
+title: "Is the World Bank Financing Bad Governance in Developing Countries?"
+author: "Raulin L. Cadet"
+date: "4 octobre 2019"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+
+```{r setup, include=FALSE}
+#knitr::opts_chunk$set(echo = TRUE)
+library(xlsx)
+library(tidyverse)
+library(ggplot2)
+
+```
+
+In developing countries with high level of corruption, governance become worst when they receive grants from the World Bank. 
+
+
+```{r data_import}
+# The data are imported bellow. The first one have data about grants fom the World. The second have the index of control for corruption. Higher index of control for corruption is a better performance.
+grants<-read.csv("https://finances.worldbank.org/api/views/34vv-5t6y/rows.csv?accessType=DOWNLOAD&bom=true&format=true")
+
+sheetName="GovernmentEffectiveness"
+corrup<-read.xlsx("wgidataset.xlsx",sheetName ="GovernmentEffectiveness" ) #"ControlofCorruption" Source: https://info.worldbank.org/governance/wgi/Home/downLoadFile?fileName=wgidataset.xlsx
+
+```
+
+
+```{r grants_Clean}
+grant<-data.frame(grants$Country,grants$Region,grants$Original.Principal.Amount,grants$Agreement.Signing.Date)
+colnames(grant)<-c("Country","Region","Amount","SignedDate")
+
+# Function to convert date to Year only
+dateY<-function(x,formatDate){      
+  d=as.Date(x,format = formatDate)
+  new_d=as.numeric(format(d,"%Y"))
+  return(new_d)
+}
+
+# Creating a column for the year of signed agreements between the World Bank and the beneficiaries of grants.
+grant['Year']=dateY(grant$SignedDate,format="%m/%d/%Y")
+
+str(grant)            # shows that the variable Amount is a factor. It should be numeric.
+grant$Amount=as.numeric(grant$Amount) # converting the variable "Amount" as numeric
+```
+
+
+```{r grants_Clean2}
+# Calculate total of grant, by country, by year
+grant2<-grant%>%
+  group_by(Country,Region,Year)%>%
+    summarize(Total=sum(Amount))
+
+head(grant2,4)                    # Viewing the first four rows of the data frame 'grant2'
+```
+
+
+```{r corrup_Clean}
+# The variable is control of corruption. Then high value is better
+colnames(corrup)<-t(corrup[12,]) # Add names of columns, available in line 12.
+corrup2<-corrup[13:226,]         # Selecting data starting on row 12. The rows above 12 do not contain data, but title information.
+
+# Selecting only the estimate's columns and the country name column. They provide the index data. The other columns are other statistics about the index.
+corrup3=data.frame(corrup2$`Country/Territory`)
+for(i in 1:dim(corrup2)[2]){
+  if(colnames(corrup2[i])=="Estimate"){
+    corrup3[as.character(i)]=corrup2[,i]
+  }
+  
+}
+
+# Names the columns of the new data frame with the years
+Year<-unique(c(t(corrup[11,])))[-1]
+Year
+colnames(corrup3)<-c("Country",Year)
+
+# Selecting data from year 2002
+year<-seq(2002,2015,1)
+corrup3<-corrup3[,c("Country",year)]
+
+######## Select in corrup only countries that receive grants #####
+corrupT<-t(corrup3)                 # Transpose the dataframe to have the countries name in columns
+colnames(corrupT)<-t(corrupT[1,])   # Change default name to countries name which are in row 1.
+corrupT<-corrupT[-1,]               # Remove the first row that contains the countries names
+
+unq<-function(x){                   # Function that returning a vector of unique values separated by comma
+  y=NULL
+  for(i in 1:length(x)){
+    if(!x[i] %in% y){
+      y=c(y,x[i])
+    }
+  }
+  return(y)
+}
+
+
+grant_countries<-unique(as.character(grant2$Country)) # Names of countries that receive grants from 2002 to 2015
+
+
+###########################################################################################
+######## Correct difference in countries names spelling, between the dataframe ############
+cog=NULL
+for(i in 1:length(grant_countries)){ # Identify difference in countries names in the two data frame
+if(!grant_countries[i] %in% colnames(corrupT)){
+    cog=c(cog,grant_countries[i])
+  }
+}
+
+# Data frame that contains names spelling that are differents
+CoSpell<-data.frame(corName=c("Central African Republic", "Congo, Dem. Rep.","Congo, Rep.","Lao PDR","Micronesia, Fed. Sts.","SÃ£o TomÃ© and Principe","Yemen, Rep.","CÃ´te d'Ivoire"),
+        grantName=c("Central Africa","Congo, Democratic Republic of", "Congo, Republic of","Lao People's Democratic Republic","Micronesia, Federated States of","Sao Tome and Principe","Yemen, Republic of","Cote d'Ivoire"))
+
+
+for(i in 1:dim(CoSpell)[1]){ # Correct the names in the data frame of control for corruption
+  cf=gsub(CoSpell$corName[i],CoSpell$grantName[i],colnames(corrupT))
+}
+
+colnames(corrupT)<-cf       # add corrected names as column names of the data frame of control for corruption
+
+##########################################################################################
+# Identify countries names that appear in both data frame
+co=NULL
+for(i in 1:length(grant_countries)){ 
+if(grant_countries[i] %in% colnames(corrupT)){
+    co=c(co,grant_countries[i])
+  }
+}
+
+corrupFi<-corrupT[,co];dim(corrupFi)      # This data frame (corrupFi) has 62 countries found in grant2 
+
+corrupFinal<-data.frame(newcol = c(t(corrupFi)), stringsAsFactors=FALSE) # Create a data frame of one column, with data of control of corruption for all countries that receive grants from the WB.
+
+
+####### continue below
+
+
+
+
+
+
+corrupFinal["Year"]<-rep(year,dim(corrupFinal)[2])   # Adding the column of the year to the new data frame.
+
+
+rep2<-function(x,n){    # This function should repeat each element of a vector n times 
+  y=NULL
+  for(i in 1:length(x)){
+    y=c(y,rep(x[i],n))
+  }
+  return(y)
+}
+
+
+corrupFinal["Country"]<-rep2(co,length(year));dim(corrupFinal) # Data frame with index of control for corruption, for countries that receive grant from the World Bank.
+
+# Data frame of grants with only country found in the data frame 'corrupFinal'. However, data are not available for some years, for some countries. That's why they do not have the same number of rows.            
+Grant<-grant2 %>%            
+  filter(Country %in% co)
+dim(Grant)
+```
+
+
+
+```{r Merge}
+# Merging data frame 'Grant' and 'corrupFinal' where country name and year are the same
+DatFinal<-inner_join(Grant, corrupFinal, by = NULL, copy = FALSE, suffix = c(".grant", ".corrup") )
+colnames(DatFinal)<-c(colnames(DatFinal)[1:3],"Grant","Control")
+```
+
+```{r DatExplor}
+str(DatFinal)
+
+DatFinal <- within(DatFinal, {        # Changing type of some variable in 'DatFinal'   
+    Country <- factor(Country)        # Convert 'Country' to factor
+    Control<-as.numeric(Control)      # Convert 'Control' to numeric
+    })
+
+```
+
+
+A scatter plot of the linkage between grants and government effecctiveness is presented below. It shows that the World Bank tends not to account for how the population perceive their governments effectiveness to grant funds to their countries.
+
+```{r graphglobal,warning=FALSE,message=FALSE}
+#cor(DatFinal$Grant,DatFinal$Control)
+gg1 <- ggplot(DatFinal, aes(x=Control, y=Grant)) + 
+  geom_point(col='forestgreen',size=2,shape=1) + 
+  geom_smooth( se=F,col='blue') + 
+  #facet_wrap(~Region) +
+  #xlim(c(0, 0.1)) + 
+  #ylim(c(0, 500000)) + 
+  labs(#subtitle="Area Vs Population", 
+       y="Grant", 
+       x="Government Effectiveness", 
+      # title="Linkage between Grant from the World Bank and Governement Effectiveness", 
+       caption = "Source: Graphic by Raulin L. Cadet, with data from the World Bank")+
+  theme_classic()
+
+plot(gg1)
+
+```
+
+Considering a scotter plot, for the same variables, but by region, only the graphic related to Africa reveals that grants tend to increase with high perception of government effectiveness. However, this relation seems to bo weak. Considering East Asia and Pacific, the curve estimating the raltion between grants and government effectiveness is almost flat, showing no relation between them. For the other regions, the relation is not consistent, suggesting that the World Bank is not following a rule related to government effectiveness to grant fund.
+
+The absence of such a rule sould not encourage government of developing countries to improve the effectiveness of public policy.
+
+```{r graphRegion,warning=FALSE,message=FALSE}
+gg2 <- ggplot(DatFinal, aes(x=Control, y=Grant)) + 
+  geom_point(col='forestgreen',size=2,shape=1) + 
+  geom_smooth( se=F,col='blue') + 
+  facet_wrap(~Region) +
+  #xlim(c(0, 0.1)) + 
+  #ylim(c(0, 500000)) + 
+  labs(subtitle="By Region (2002-2015)", 
+       y="Grant", 
+       x="Government Effectiveness", 
+       title="Linkage between Grant from the World Bank and Governement Effectiveness", 
+       caption = "Source: Graphic by Raulin L. Cadet, with data from the World Bank")+
+  theme_classic()
+
+plot(gg2)
+
+```
+

@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "\nlibrary(xlsx)\nlibrary(tidyverse)\nlibrary(ggplot2)\n\n\n# The data are imported bellow. The first one have data about grants fom the World. The second have the index of control for corruption. Higher index of control for corruption is a better performance.\ngrants<-read.csv(\"https://finances.worldbank.org/api/views/34vv-5t6y/rows.csv?accessType=DOWNLOAD&bom=true&format=true\")\n\nsheetName=\"GovernmentEffectiveness\"\ncorrup<-read.xlsx(\"wgidataset.xlsx\",sheetName =\"GovernmentEffectiveness\" ) #\"ControlofCorruption\" Source: https://info.worldbank.org/governance/wgi/Home/downLoadFile?fileName=wgidataset.xlsx\n\n",
+    "created" : 1570451487196.000,
+    "dirty" : true,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1622912151",
+    "id" : "543CA9F3",
+    "lastKnownWriteTime" : 1570451599,
+    "last_content_update" : 1570451608245,
+    "path" : "C:/Users/CRL/Box Sync/GithubCRL/WorldBank_GrantGovernance/WB_grants.R",
+    "project_path" : "WB_grants.R",
+    "properties" : {
+        "tempName" : "Untitled2"
+    },
+    "relative_order" : 15,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

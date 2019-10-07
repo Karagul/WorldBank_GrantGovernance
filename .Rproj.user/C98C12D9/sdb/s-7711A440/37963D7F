@@ -1,0 +1,29 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1570368635742.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "37963D7F",
+    "lastKnownWriteTime" : 3419473789575321445,
+    "last_content_update" : 1570368635742,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "649A3363",
+        "caption" : "Grant",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=Grant&cache_key=649A3363",
+        "displayedObservations" : 868,
+        "environment" : "",
+        "object" : "Grant",
+        "preview" : 0,
+        "totalObservations" : 868,
+        "variables" : 4
+    },
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

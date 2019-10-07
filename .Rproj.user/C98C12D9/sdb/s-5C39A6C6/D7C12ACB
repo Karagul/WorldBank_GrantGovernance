@@ -1,0 +1,29 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1570204079350.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "D7C12ACB",
+    "lastKnownWriteTime" : 29555177500377187,
+    "last_content_update" : 1570204079350,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "91E19A4C",
+        "caption" : "grant2",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=grant2&cache_key=91E19A4C",
+        "displayedObservations" : 415,
+        "environment" : "",
+        "object" : "grant2",
+        "preview" : 0,
+        "totalObservations" : 415,
+        "variables" : 3
+    },
+    "relative_order" : 7,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

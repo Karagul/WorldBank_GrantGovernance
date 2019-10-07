@@ -1,0 +1,29 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1570212411522.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "1EE7275D",
+    "lastKnownWriteTime" : 3419473789575321445,
+    "last_content_update" : 1570212411522,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "ECD06910",
+        "caption" : "corrupF",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=corrupF&cache_key=ECD06910",
+        "displayedObservations" : "14",
+        "environment" : "",
+        "object" : "corrupF",
+        "preview" : "0",
+        "totalObservations" : "14",
+        "variables" : "76"
+    },
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}
