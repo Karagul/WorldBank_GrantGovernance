@@ -3,8 +3,9 @@ title: "Is the World Bank Financing Bad Governance in Developing Countries?"
 author: "Raulin L. Cadet"
 date: "4 octobre 2019"
 output:
-  html_document: default
+  word_document: default
   pdf_document: default
+  html_document: default
 ---
 
 
@@ -186,7 +187,7 @@ A scatter plot of the linkage between grants and government effecctiveness is pr
 #cor(DatFinal$Grant,DatFinal$Control)
 gg1 <- ggplot(DatFinal, aes(x=Control, y=Grant)) + 
   geom_point(col='forestgreen',size=2,shape=1) + 
-  geom_smooth( se=F,col='blue') + 
+  geom_smooth(method = 'lm', se=F,col='blue') + 
   #facet_wrap(~Region) +
   #xlim(c(0, 0.1)) + 
   #ylim(c(0, 500000)) + 
@@ -197,7 +198,7 @@ gg1 <- ggplot(DatFinal, aes(x=Control, y=Grant)) +
        caption = "Source: Graphic by Raulin L. Cadet, with data from the World Bank")+
   theme_classic()
 
-plot(gg1)
+gg1+geom_text(aes(x=0,y=1400,label=paste("p-value=",round(cor.test(Grant,Control)$p.value,digits = 2))),col='red')
 
 ```
 
@@ -205,21 +206,41 @@ Considering a scotter plot, for the same variables, but by region, only the grap
 
 The absence of such a rule sould not encourage government of developing countries to improve the effectiveness of public policy.
 
-```{r graphRegion,warning=FALSE,message=FALSE}
-gg2 <- ggplot(DatFinal, aes(x=Control, y=Grant)) + 
+
+Let us verify if there is a significant linear relationship between the grants and government effectiveness.
+
+```{r correlatRegion}
+
+cor<-DatFinal%>%                              # Calculating the correlation coefficient (method of Pearson)
+  group_by(Region)%>%                         # Grouping by region
+  summarise(cor.test(Control,Grant)$estimate)
+
+pVal<-DatFinal%>%                             # Calculating the p-value of the correlation by region
+  group_by(Region)%>%
+  summarise(cor.test(Control,Grant)$p.value)
+```
+
+
+```{r graphic2,warning=FALSE,message=FALSE}
+# Merging the data frame 'DatFInal' with data related to p-value for correlation test by region
+# to include p-value in the following graphic
+datfinal<-inner_join(DatFinal, pVal, by = NULL, copy = FALSE, suffix = c(".grant", ".corrup") )
+colnames(datfinal)<-c(colnames(DatFinal)[1:5],"P_value")
+
+
+gg2 <- ggplot(datfinal, aes(x=Control, y=Grant)) + # Scatter plot linking 'Grant' and 'Control'
   geom_point(col='forestgreen',size=2,shape=1) + 
-  geom_smooth( se=F,col='blue') + 
-  facet_wrap(~Region) +
-  #xlim(c(0, 0.1)) + 
-  #ylim(c(0, 500000)) + 
+  geom_smooth(method = 'lm', se=F,col='blue') +    # Design the linear relationship (blue line)
+  
+  facet_wrap(~Region)+                             # Design a graphic by region
   labs(subtitle="By Region (2002-2015)", 
        y="Grant", 
        x="Government Effectiveness", 
        title="Linkage between Grant from the World Bank and Governement Effectiveness", 
        caption = "Source: Graphic by Raulin L. Cadet, with data from the World Bank")+
   theme_classic()
-
-plot(gg2)
+gg2+geom_text(aes(x=-1,y=1200,label=paste("p-value=",round(P_value,digits = 2))),col='red')
 
 ```
+
 
