@@ -9,7 +9,7 @@ output:
 
 
 ```{r setup, include=FALSE}
-#knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE,fig.show = TRUE)
 library(xlsx)
 library(tidyverse)
 library(ggplot2)
