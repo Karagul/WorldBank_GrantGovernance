@@ -17,7 +17,6 @@ library(ggplot2)
 
 ```
 
-In developing countries with high level of corruption, governance become worst when they receive grants from the World Bank. 
 
 
 ```{r data_import}
@@ -59,6 +58,7 @@ head(grant2,4)                    # Viewing the first four rows of the data fram
 ```
 
 
+
 ```{r corrup_Clean}
 # The variable is control of corruption. Then high value is better
 colnames(corrup)<-t(corrup[12,]) # Add names of columns, available in line 12.
@@ -87,15 +87,6 @@ corrupT<-t(corrup3)                 # Transpose the dataframe to have the countr
 colnames(corrupT)<-t(corrupT[1,])   # Change default name to countries name which are in row 1.
 corrupT<-corrupT[-1,]               # Remove the first row that contains the countries names
 
-unq<-function(x){                   # Function that returning a vector of unique values separated by comma
-  y=NULL
-  for(i in 1:length(x)){
-    if(!x[i] %in% y){
-      y=c(y,x[i])
-    }
-  }
-  return(y)
-}
 
 
 grant_countries<-unique(as.character(grant2$Country)) # Names of countries that receive grants from 2002 to 2015
@@ -181,6 +172,59 @@ DatFinal <- within(DatFinal, {        # Changing type of some variable in 'DatFi
 ```
 
 
+
+Does the world Bank provide grants that finance ineffective governaments in developing countries?
+
+```{r receivers2}
+# Proportion of countries that receive grants, by region
+corrup22<-DatFinal%>%
+  group_by(Region)%>%
+  summarise(corMean = mean(Control,na.rm=T))
+
+
+
+#######################################
+Grant22<-DatFinal%>%
+  group_by(Region)%>%
+  summarise(gMean = mean(Grant) )
+#####
+Corrup22<-DatFinal%>%
+  group_by(Region)%>%
+  summarise(gMean = mean(Control,na.rm=T) )
+
+
+g<-data.frame(Grant22,rep("Grant",6))
+c2=data.frame(corrup22,rep("Effectiveness",6));colnames(c2)<-c("Region","prop","dattype");colnames(g)<-colnames(c2)
+g$prop<-scales::rescale(g$prop, to=c(1,10))    # Scalling data with min/max method
+c2$prop<-scales::rescale(c2$prop, to=c(1,10))  # Scalling data with min/max method
+corrupgrant<-rbind(g,c2);corrupgrant
+ggplot(corrupgrant, aes(fill=Region, y=prop, x=Region)) + 
+    geom_bar(position="dodge", stat="identity",aes(fill=dattype)) +
+    #scale_fill_viridis(discrete = T, option = "E") +
+    #ggtitle("Scale of the means of grant and effectiveness") +
+    facet_wrap(~dattype) +
+    #theme_ipsum() +
+  coord_flip()+
+    theme(legend.position="none") +
+    xlab("")+
+    ylab("Scaled of mean from 1 to 10")+
+  theme(axis.line=element_blank(),
+      #axis.text.x=element_blank(),
+      axis.ticks=element_blank(),
+      legend.position="none",
+      panel.background=element_blank(),
+      panel.border=element_blank(),
+      panel.grid.major=element_blank(),
+      panel.grid.minor=element_blank(),
+      plot.background=element_blank())
+########################3
+
+############################
+
+
+```
+
+
 A scatter plot of the linkage between grants and government effecctiveness is presented below. It shows that the World Bank tends not to account for how the population perceive their governments effectiveness to grant funds to their countries.
 
 ```{r graphglobal,warning=FALSE,message=FALSE}
@@ -202,12 +246,12 @@ gg1+geom_text(aes(x=0,y=1400,label=paste("p-value=",round(cor.test(Grant,Control
 
 ```
 
-Considering a scotter plot, for the same variables, but by region, only the graphic related to Africa reveals that grants tend to increase with high perception of government effectiveness. However, this relation seems to bo weak. Considering East Asia and Pacific, the curve estimating the raltion between grants and government effectiveness is almost flat, showing no relation between them. For the other regions, the relation is not consistent, suggesting that the World Bank is not following a rule related to government effectiveness to grant fund.
-
-The absence of such a rule sould not encourage government of developing countries to improve the effectiveness of public policy.
+Considering a scotter plot, for the same variables, but by region, only the graphic related to Africa reveals that grants tend to increase with high perception of government effectiveness. However, this relation seems to bo weak. 
 
 
-Let us verify if there is a significant linear relationship between the grants and government effectiveness.
+
+
+Let us verify if there is a significant linear relationship between the grants and government effectiveness, by region.
 
 ```{r correlatRegion}
 
@@ -233,11 +277,12 @@ gg2 <- ggplot(datfinal, aes(x=Control, y=Grant)) + # Scatter plot linking 'Grant
   geom_smooth(method = 'lm', se=F,col='blue') +    # Design the linear relationship (blue line)
   
   facet_wrap(~Region)+                             # Design a graphic by region
-  labs(subtitle="By Region (2002-2015)", 
+  labs(#subtitle="By Region (2002-2015)", 
        y="Grant", 
-       x="Government Effectiveness", 
-       title="Linkage between Grant from the World Bank and Governement Effectiveness", 
-       caption = "Source: Graphic by Raulin L. Cadet, with data from the World Bank")+
+       x="Government Effectiveness"#, 
+       #title="Linkage between Grant from the World Bank and Governement Effectiveness", 
+      # caption = "Source: Graphic by Raulin L. Cadet, with data from the World Bank"
+      )+
   theme_classic()
 gg2+geom_text(aes(x=-1,y=1200,label=paste("p-value=",round(P_value,digits = 2))),col='red')
 
