@@ -181,8 +181,6 @@ corrup22<-DatFinal%>%
   group_by(Region)%>%
   summarise(corMean = mean(Control,na.rm=T))
 
-
-
 #######################################
 Grant22<-DatFinal%>%
   group_by(Region)%>%
@@ -200,16 +198,14 @@ c2$prop<-scales::rescale(c2$prop, to=c(1,10))  # Scalling data with min/max meth
 corrupgrant<-rbind(g,c2);corrupgrant
 ggplot(corrupgrant, aes(fill=Region, y=prop, x=Region)) + 
     geom_bar(position="dodge", stat="identity",aes(fill=dattype)) +
-    #scale_fill_viridis(discrete = T, option = "E") +
-    #ggtitle("Scale of the means of grant and effectiveness") +
     facet_wrap(~dattype) +
-    #theme_ipsum() +
-  coord_flip()+
+    coord_flip()+
     theme(legend.position="none") +
     xlab("")+
     ylab("Scaled of mean from 1 to 10")+
+  labs(title="Average grants provided by the World Bank and average index of government effectiveness",
+    caption = "Source: Graphic realized by Raulin L. Cadet, with data from the World Bank")+
   theme(axis.line=element_blank(),
-      #axis.text.x=element_blank(),
       axis.ticks=element_blank(),
       legend.position="none",
       panel.background=element_blank(),
@@ -217,38 +213,29 @@ ggplot(corrupgrant, aes(fill=Region, y=prop, x=Region)) +
       panel.grid.major=element_blank(),
       panel.grid.minor=element_blank(),
       plot.background=element_blank())
-########################3
-
-############################
 
 
 ```
 
 
-A scatter plot of the linkage between grants and government effecctiveness is presented below. It shows that the World Bank tends not to account for how the population perceive their governments effectiveness to grant funds to their countries.
+A scatter plot of the linkage between grants and government effecctiveness is presented below. It shows no significant relationship between grants provided by the World Bank and the index of government effectiveness.
 
 ```{r graphglobal,warning=FALSE,message=FALSE}
 #cor(DatFinal$Grant,DatFinal$Control)
 gg1 <- ggplot(DatFinal, aes(x=Control, y=Grant)) + 
   geom_point(col='forestgreen',size=2,shape=1) + 
   geom_smooth(method = 'lm', se=F,col='blue') + 
-  #facet_wrap(~Region) +
-  #xlim(c(0, 0.1)) + 
-  #ylim(c(0, 500000)) + 
-  labs(#subtitle="Area Vs Population", 
-       y="Grant", 
+  
+  labs(subtitle="(2002-2015)", 
+       y="Grants in XDR", 
        x="Government Effectiveness", 
-      # title="Linkage between Grant from the World Bank and Governement Effectiveness", 
-       caption = "Source: Graphic by Raulin L. Cadet, with data from the World Bank")+
+       title="Relationship between Grants from the World Bank and Governement Effectiveness", 
+       caption = "Source: Graphic realized by Raulin L. Cadet, with data from the World Bank")+
   theme_classic()
 
 gg1+geom_text(aes(x=0,y=1400,label=paste("p-value=",round(cor.test(Grant,Control)$p.value,digits = 2))),col='red')
 
 ```
-
-Considering a scotter plot, for the same variables, but by region, only the graphic related to Africa reveals that grants tend to increase with high perception of government effectiveness. However, this relation seems to bo weak. 
-
-
 
 
 Let us verify if there is a significant linear relationship between the grants and government effectiveness, by region.
@@ -265,6 +252,7 @@ pVal<-DatFinal%>%                             # Calculating the p-value of the c
 ```
 
 
+
 ```{r graphic2,warning=FALSE,message=FALSE}
 # Merging the data frame 'DatFInal' with data related to p-value for correlation test by region
 # to include p-value in the following graphic
@@ -277,14 +265,15 @@ gg2 <- ggplot(datfinal, aes(x=Control, y=Grant)) + # Scatter plot linking 'Grant
   geom_smooth(method = 'lm', se=F,col='blue') +    # Design the linear relationship (blue line)
   
   facet_wrap(~Region)+                             # Design a graphic by region
-  labs(#subtitle="By Region (2002-2015)", 
-       y="Grant", 
-       x="Government Effectiveness"#, 
-       #title="Linkage between Grant from the World Bank and Governement Effectiveness", 
-      # caption = "Source: Graphic by Raulin L. Cadet, with data from the World Bank"
+  labs(subtitle="By Region (2002-2015)", 
+       y="Grants in XDR", 
+       x="Government Effectiveness", 
+       title="Relationship between Grants from the World Bank and Governement Effectiveness", 
+       caption = "Source: Graphic realized by Raulin L. Cadet, with data from the World Bank"
       )+
   theme_classic()
 gg2+geom_text(aes(x=-1,y=1200,label=paste("p-value=",round(P_value,digits = 2))),col='red')
+
 
 ```
 
